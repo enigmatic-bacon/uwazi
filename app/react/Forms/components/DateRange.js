@@ -4,9 +4,18 @@ import { Translate } from 'app/I18N';
 import DatePicker from './DatePicker';
 
 class DateRange extends Component {
-  onChange(prop, propValue) {
+  onChangeFrom(propValue) {
     const { value, onChange } = this.props;
-    const state = { ...value, [prop]: propValue };
+    const state = { ...value, from: propValue };
+    console.log('State: ', state);
+
+    onChange(state);
+  }
+
+  onChangeTo(propValue) {
+    const { value, onChange } = this.props;
+    const state = { ...value, to: propValue };
+    console.log('State: ', state);
 
     onChange(state);
   }
@@ -27,7 +36,7 @@ class DateRange extends Component {
             format={format}
             useTimezone={useTimezone}
             value={stateFrom}
-            onChange={val => this.onChange('from', val)}
+            onChange={val => this.onChangeFrom (val)}
           />
         </div>
         <div className="DatePicker__To">
@@ -40,7 +49,7 @@ class DateRange extends Component {
             useTimezone={useTimezone}
             value={stateTo}
             endOfDay
-            onChange={val => this.onChange('to', val)}
+            onChange={val => this.onChangeTo(val)}
           />
         </div>
       </div>
