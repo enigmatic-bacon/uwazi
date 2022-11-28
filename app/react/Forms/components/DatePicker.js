@@ -30,7 +30,10 @@ class DatePicker extends Component {
     const { endOfDay, useTimezone, locale, onChange } = this.props;
     //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
     const date = endOfDay ? new Date(datePickerValue) : new Date(datePickerValue)// toEndOfDay(new Date(datePickerValue))
-    if (datePickerValue) {
+    if (!datePickerValue) {
+      //test should return empty value
+      onChange(null);
+    } else {
       this.setState({
         //ex: 11/29/2022
         asString: date.toLocaleDateString(locale, this.options),
@@ -41,16 +44,13 @@ class DatePicker extends Component {
       //test should set the value to timestamp NOT offsetting to UTC
       onChange(date.getTime() / 1000);
     }
-    else {
-      //test should return empty value
-      onChange(null);
-    }
   }
 
   render() {
-    const { locale, format } = this.props;
+    const { locale, format, selected } = this.props;
     const { startDate, endDate, minDate, selectsStart, selectsEnd } = this.props;
     //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
+    console.log(selected);
     const defaultFormat = 'dd/MM/yyyy';
     return (
       <DatePickerComponent
