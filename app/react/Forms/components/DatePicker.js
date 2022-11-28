@@ -37,6 +37,10 @@ class DatePicker extends Component {
       });
       onChange(date.getTime());
     }
+    else {
+      //test should return empty value
+      onChange(null);
+    }
   }
 
   render() {
