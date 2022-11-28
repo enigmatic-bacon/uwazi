@@ -5,6 +5,7 @@ import DatePickerComponent, { registerLocale } from 'react-datepicker';
 import * as localization from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import DateRange from './DateRange';
 
 class DatePicker extends Component {
   constructor(props) {
@@ -26,25 +27,37 @@ class DatePicker extends Component {
   }
 
   handleChange(datePickerValue) {
-    //TODO add back endOfDay
-    const { endOfDay, useTimezone, locale } = this.props;
+    //TODO add back endOfDay and timezone offset https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+    const { endOfDay, useTimezone, locale, onChange } = this.props;
+    //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
+    const date = new Date(datePickerValue)
     if (datePickerValue) {
       this.setState({
-        asString: new Date(datePickerValue).toLocaleDateString(locale, this.options),
-        asInt: datePickerValue
-      })
+        //ex: 11/29/2022
+        asString: date.toLocaleDateString(locale, this.options),
+        //ex: 1669698000000
+        asInt: date.getTime()
+      });
+      onChange(date.getTime());
     }
   }
 
   render() {
-    const { locale, format, value, selected } = this.props;
+    //Format is currently never set
+    const { locale, format } = this.props;
+    const { startDate, endDate, selectsStart, selectsEnd } = this.props;
+    //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
     const defaultFormat = 'dd/MM/yyyy';
     return (
       <DatePickerComponent
         value={this.state.asString}
         className="form-control"
         onChange={this.handleChange}
-        selected={value}
+        selected={this.state.asInt}
+        startDate={startDate}
+        endDate={endDate}
+        selectsStart={selectsStart}
+        selectsEnd={selectsEnd}
         locale={locale}
         placeholderText={format || defaultFormat}
         popperProps={{ strategy: 'fixed' }}
