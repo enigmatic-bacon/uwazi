@@ -5,71 +5,46 @@ import DatePickerComponent, { registerLocale } from 'react-datepicker';
 import * as localization from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import moment from 'moment-timezone';
-
-const removeOffset = (useTimezone, value) => {
-  let datePickerValue = null;
-  const miliseconds = value * 1000;
-  if (value) {
-    const newValue = moment.utc(miliseconds);
-
-    if (!useTimezone) {
-      // in order to get the system offset for the specific date we
-      // need to create a new not UTC moment object with the original timestamp
-      newValue.subtract(moment(moment(miliseconds)).utcOffset(), 'minutes');
-    }
-
-    datePickerValue = parseInt(newValue.locale('en').format('x'), 10);
-  }
-
-  return datePickerValue;
-};
-
-const addOffset = (useTimezone, endOfDay, value) => {
-  const newValue = moment.utc(value);
-
-  if (!useTimezone) {
-    // in order to get the proper offset moment has to be initialized with the actual date
-    // without this you always get the "now" moment offset
-    newValue.add(moment(value).utcOffset(), 'minutes');
-  }
-
-  if (endOfDay) {
-    const method = useTimezone ? newValue.local() : newValue.utc();
-    method.endOf('day');
-  }
-
-  return newValue;
-};
 
 class DatePicker extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.state = {
+      asString : undefined,
+      asInt : undefined,
+    };
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options
+    this.options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }
     registerLocale(props.locale || 'en', localization[props.locale] || localization.enGB);
+    console.log('Locale: ', props.locale);
+
   }
 
   handleChange(datePickerValue) {
-    const { endOfDay, useTimezone, onChange } = this.props;
-
-    if (!datePickerValue) {
-      onChange(null);
-    } else {
-      const newValue = addOffset(useTimezone, endOfDay, datePickerValue);
-      onChange(parseInt(newValue.locale('en').format('X'), 10));
+    //TODO add back endOfDay
+    const { endOfDay, useTimezone, locale } = this.props;
+    if (datePickerValue) {
+      this.setState({
+        asString: new Date(datePickerValue).toLocaleDateString(locale, this.options),
+        asInt: datePickerValue
+      })
     }
   }
 
   render() {
-    const { locale, format, useTimezone, value } = this.props;
+    const { locale, format, value, selected } = this.props;
     const defaultFormat = 'dd/MM/yyyy';
-    const datePickerValue = removeOffset(useTimezone, value);
     return (
       <DatePickerComponent
-        dateFormat={format || defaultFormat}
+        value={this.state.asString}
         className="form-control"
         onChange={this.handleChange}
-        selected={datePickerValue}
+        selected={value}
         locale={locale}
         placeholderText={format || defaultFormat}
         popperProps={{ strategy: 'fixed' }}
@@ -87,6 +62,12 @@ DatePicker.defaultProps = {
   locale: 'en',
   format: 'dd/MM/yyyy',
   useTimezone: false,
+  
+  selected: undefined,
+  startDate: undefined,
+  endDate: undefined,
+  selectsStart: false,
+  selectsEnd: false,
 };
 
 DatePicker.propTypes = {
@@ -96,6 +77,12 @@ DatePicker.propTypes = {
   locale: PropTypes.string,
   format: PropTypes.string,
   useTimezone: PropTypes.bool,
+
+  selected: PropTypes.number,
+  startDate: PropTypes.number,
+  endDate: PropTypes.number,
+  selectsStart: PropTypes.bool,
+  selectsEnd: PropTypes.bool,
 };
 
 export default connect()(DatePicker);
