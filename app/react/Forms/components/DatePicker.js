@@ -3,9 +3,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import DatePickerComponent, { registerLocale } from 'react-datepicker';
 import * as localization from 'date-fns/locale';
+import toEndOfDay from 'date-fns/endOfDay';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
+//Moment.js is now a legacy project so I'm moving away from it https://momentjs.com/docs/ 
 class DatePicker extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +29,7 @@ class DatePicker extends Component {
     //TODO add back endOfDay and timezone offset https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
     const { endOfDay, useTimezone, locale, onChange } = this.props;
     //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
-    const date = new Date(datePickerValue)
+    const date = endOfDay ? new Date(datePickerValue) : new Date(datePickerValue)// toEndOfDay(new Date(datePickerValue))
     if (datePickerValue) {
       this.setState({
         //ex: 11/29/2022
@@ -40,7 +42,7 @@ class DatePicker extends Component {
       onChange(date.getTime() / 1000);
     }
     else {
-      //test 
+      //test should return empty value
       onChange(null);
     }
   }
