@@ -5,7 +5,6 @@ import DatePickerComponent, { registerLocale } from 'react-datepicker';
 import * as localization from 'date-fns/locale';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import DateRange from './DateRange';
 
 class DatePicker extends Component {
   constructor(props) {
@@ -22,8 +21,6 @@ class DatePicker extends Component {
       day: "2-digit",
     }
     registerLocale(props.locale || 'en', localization[props.locale] || localization.enGB);
-    console.log('Locale: ', props.locale);
-
   }
 
   handleChange(datePickerValue) {
@@ -43,9 +40,8 @@ class DatePicker extends Component {
   }
 
   render() {
-    //Format is currently never set
     const { locale, format } = this.props;
-    const { startDate, endDate, selectsStart, selectsEnd } = this.props;
+    const { startDate, endDate, minDate, selectsStart, selectsEnd } = this.props;
     //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
     const defaultFormat = 'dd/MM/yyyy';
     return (
@@ -56,6 +52,7 @@ class DatePicker extends Component {
         selected={this.state.asInt}
         startDate={startDate}
         endDate={endDate}
+        minDate={minDate}
         selectsStart={selectsStart}
         selectsEnd={selectsEnd}
         locale={locale}
@@ -79,6 +76,7 @@ DatePicker.defaultProps = {
   selected: undefined,
   startDate: undefined,
   endDate: undefined,
+  minDate: undefined,
   selectsStart: false,
   selectsEnd: false,
 };
@@ -94,6 +92,7 @@ DatePicker.propTypes = {
   selected: PropTypes.number,
   startDate: PropTypes.number,
   endDate: PropTypes.number,
+  minDate: PropTypes.number,
   selectsStart: PropTypes.bool,
   selectsEnd: PropTypes.bool,
 };
