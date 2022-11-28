@@ -35,10 +35,12 @@ class DatePicker extends Component {
         //ex: 1669698000000
         asInt: date.getTime()
       });
-      onChange(date.getTime());
+      //Convert from milliseconds to seconds
+      //test should set the value to timestamp NOT offsetting to UTC
+      onChange(date.getTime() / 1000);
     }
     else {
-      //test should return empty value
+      //test 
       onChange(null);
     }
   }
