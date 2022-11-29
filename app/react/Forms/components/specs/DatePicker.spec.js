@@ -33,14 +33,16 @@ describe('DatePicker', () => {
 
   it('should render a DatePickerComponent with the correct date transformed to local value', () => {
     render();
-    expect(input.props().selected).toBe(parseInt(moment('2016-07-28').format('x'), 10));
+    input.simulate('change', moment(date).toDate());
+    expect(props.onChange).toHaveBeenCalledWith(parseInt(moment('2016-07-28').format('x'), 10));
   });
 
   describe('when useTimezone is true', () => {
     it('should render a DatePickerComponent without transforming the value to local', () => {
       props.useTimezone = true;
       render();
-      expect(input.props().selected).toBe(parseInt(date.format('x'), 10));
+      input.simulate('change', moment(date).toDate());
+      expect(props.onChange).toHaveBeenCalledWith(parseInt(date.format('x'), 10));
     });
   });
 
@@ -54,11 +56,10 @@ describe('DatePicker', () => {
       { timezone: 'Europe/Madrid', dateToTest: '1973-08-18' },
     ])('should use the timestamp offsetting to UTC %s', ({ timezone, dateToTest }) => {
       moment.tz.setDefault(timezone);
-      const newDate = moment.utc(dateToTest);
-      props.value = Number(newDate.format('X'));
-
+      const newDate = moment(dateToTest).toDate();
       render();
-      expect(input.props().selected).toBe(parseInt(moment(dateToTest).format('x'), 10));
+      input.simulate('change', newDate);
+      expect(props.onChange).toHaveBeenCalledWith(parseInt(moment.utc(dateToTest).format('X'), 10));
     });
 
     it.each([
@@ -88,7 +89,8 @@ describe('DatePicker', () => {
 
     it('should render a latin-based value (until correct locales are implemented)', () => {
       render();
-      expect(input.props().selected).toBe(
+      input.simulate('change', moment(date).toDate());
+      expect(props.onChange).toHaveBeenCalledWith(
         parseInt(moment('2016-07-28').locale('en').format('x'), 10)
       );
     });

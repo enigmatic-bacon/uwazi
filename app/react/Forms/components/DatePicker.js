@@ -29,28 +29,26 @@ class DatePicker extends Component {
     //TODO add back endOfDay and timezone offset https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
     const { endOfDay, useTimezone, locale, onChange } = this.props;
     //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
-    const date = endOfDay ? new Date(datePickerValue) : new Date(datePickerValue)// toEndOfDay(new Date(datePickerValue))
+    const date = useTimezone ? new Date(datePickerValue) : new Date(datePickerValue)// toEndOfDay(new Date(datePickerValue))
     if (!datePickerValue) {
       //test should return empty value
       onChange(null);
     } else {
       this.setState({
         //ex: 11/29/2022
-        asString: date.toLocaleDateString(locale, this.options),
+        asString: new Date(date).toLocaleDateString(locale, this.options),
         //ex: 1669698000000
         asInt: date.getTime()
       });
-      //Convert from milliseconds to seconds
       //test should set the value to timestamp NOT offsetting to UTC
-      onChange(date.getTime() / 1000);
+      onChange(date.getTime());
     }
   }
 
   render() {
-    const { locale, format, selected } = this.props;
+    const { locale, format } = this.props;
     const { startDate, endDate, minDate, selectsStart, selectsEnd } = this.props;
     //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
-    console.log(selected);
     const defaultFormat = 'dd/MM/yyyy';
     return (
       <DatePickerComponent
@@ -81,7 +79,6 @@ DatePicker.defaultProps = {
   format: 'dd/MM/yyyy',
   useTimezone: false,
   
-  selected: undefined,
   startDate: undefined,
   endDate: undefined,
   minDate: undefined,
@@ -97,7 +94,6 @@ DatePicker.propTypes = {
   format: PropTypes.string,
   useTimezone: PropTypes.bool,
 
-  selected: PropTypes.number,
   startDate: PropTypes.number,
   endDate: PropTypes.number,
   minDate: PropTypes.number,
