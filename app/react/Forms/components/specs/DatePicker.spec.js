@@ -20,7 +20,7 @@ describe('DatePicker', () => {
 
   beforeEach(() => {
     props = {
-      value: Number(date.format('X')),
+      value: Number(date.format('x')),
       onChange: jasmine.createSpy('onChange'),
     };
   });
@@ -59,7 +59,7 @@ describe('DatePicker', () => {
       const newDate = moment(dateToTest).toDate();
       render();
       input.simulate('change', newDate);
-      expect(props.onChange).toHaveBeenCalledWith(parseInt(moment.utc(dateToTest).format('X'), 10));
+      expect(props.onChange).toHaveBeenCalledWith(parseInt(moment.utc(dateToTest).format('x'), 10));
     });
 
     it.each([
@@ -71,7 +71,7 @@ describe('DatePicker', () => {
       const newDate = moment(dateToTest).toDate();
       render();
       input.simulate('change', newDate);
-      expect(props.onChange).toHaveBeenCalledWith(parseInt(moment.utc(dateToTest).format('X'), 10));
+      expect(props.onChange).toHaveBeenCalledWith(parseInt(moment.utc(dateToTest).format('x'), 10));
     });
   });
 
@@ -101,7 +101,7 @@ describe('DatePicker', () => {
       render();
       input.simulate('change', newDate);
       expect(props.onChange).toHaveBeenCalledWith(
-        parseInt(moment.utc('2020-08-18').locale('en').format('X'), 10)
+        parseInt(moment.utc('2020-08-18').locale('en').format('x'), 10)
       );
     });
   });
@@ -124,7 +124,7 @@ describe('DatePicker', () => {
         .utc(newDate)
         .add(moment().utcOffset(), 'minute')
         .endOf('day');
-      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('X')));
+      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('x')));
     });
   });
 
@@ -139,7 +139,7 @@ describe('DatePicker', () => {
       render();
       input.simulate('change', newDate);
       const expectedOnChangeValue = moment.utc(newDate);
-      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('X')));
+      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('x')));
     });
 
     it('should set the value to the end of the day NOT offsetting to UTC', () => {
@@ -147,7 +147,7 @@ describe('DatePicker', () => {
       render();
       input.simulate('change', newDate);
       const expectedOnChangeValue = moment.utc(newDate).local().endOf('day');
-      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('X')));
+      expect(props.onChange).toHaveBeenCalledWith(Number(expectedOnChangeValue.format('x')));
     });
   });
 });
