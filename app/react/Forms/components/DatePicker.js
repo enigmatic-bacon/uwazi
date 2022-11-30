@@ -29,7 +29,12 @@ class DatePicker extends Component {
     //TODO add back endOfDay and timezone offset https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
     const { endOfDay, useTimezone, locale, onChange } = this.props;
     //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
-    const date = useTimezone ? new Date(datePickerValue) : new Date(datePickerValue)// toEndOfDay(new Date(datePickerValue))
+    const date = new Date(datePickerValue)
+    if (!useTimezone) {
+      //getTimezoneOffset returns the difference, in minutes (need to convert to ms)
+      date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000)
+    }
+    // toEndOfDay(new Date(datePickerValue))
     if (!datePickerValue) {
       //test should return empty value
       onChange(null);
