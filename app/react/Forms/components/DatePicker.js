@@ -52,11 +52,13 @@ class DatePicker extends Component {
 
   render() {
     const { locale, format } = this.props;
+    console.log('format', format);
     const { startDate, endDate, minDate, selectsStart, selectsEnd } = this.props;
     //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
     const defaultFormat = 'dd/MM/yyyy';
     return (
       <DatePickerComponent
+        format={format}
         value={this.state.asString}
         className="form-control"
         onChange={this.handleChange}
