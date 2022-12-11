@@ -4,8 +4,44 @@ import 'react-datepicker/dist/react-datepicker.css';
 import DatePickerComponent, { registerLocale } from 'react-datepicker';
 import * as localization from 'date-fns/locale';
 import toEndOfDay from 'date-fns/endOfDay';
+import moment from 'moment-timezone';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+const removeOffset = (useTimezone, value) => {
+  let datePickerValue = null;
+  const miliseconds = value * 1000;
+  if (value) {
+    const newValue = moment.utc(miliseconds);
+
+    if (!useTimezone) {
+      // in order to get the system offset for the specific date we
+      // need to create a new not UTC moment object with the original timestamp
+      newValue.subtract(moment(moment(miliseconds)).utcOffset(), 'minutes');
+    }
+
+    datePickerValue = parseInt(newValue.locale('en').format('x'), 10);
+  }
+
+  return datePickerValue;
+};
+
+const addOffset = (useTimezone, endOfDay, value) => {
+  const newValue = moment.utc(value);
+
+  if (!useTimezone) {
+    // in order to get the proper offset moment has to be initialized with the actual date
+    // without this you always get the "now" moment offset
+    newValue.add(moment(value).utcOffset(), 'minutes');
+  }
+
+  if (endOfDay) {
+    const method = useTimezone ? newValue.local() : newValue.utc();
+    method.endOf('day');
+  }
+
+  return newValue;
+};
 
 //Moment.js is now a legacy project so I'm moving away from it https://momentjs.com/docs/ 
 class DatePicker extends Component {
@@ -26,43 +62,29 @@ class DatePicker extends Component {
   }
 
   handleChange(datePickerValue) {
-    //TODO add back endOfDay and timezone offset https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
-    const { endOfDay, useTimezone, locale, onChange } = this.props;
-    //ex: Nov 29 2022 00:00:00 GMT-0500 (Eastern Standard Time)
-    const date = new Date(datePickerValue)
-    if (!useTimezone) {
-      //getTimezoneOffset returns the difference, in minutes (need to convert to ms)
-      date.setTime(date.getTime() + date.getTimezoneOffset() * 60 * 1000)
-    }
-    // toEndOfDay(new Date(datePickerValue))
+    const { endOfDay, useTimezone, onChange } = this.props;
+
     if (!datePickerValue) {
-      //test should return empty value
       onChange(null);
     } else {
-      this.setState({
-        //ex: 11/29/2022
-        asString: new Date(date).toLocaleDateString(locale, this.options),
-        //ex: 1669698000000
-        asInt: date.getTime()
-      });
-      //test should set the value to timestamp NOT offsetting to UTC
-      onChange(date.getTime());
+      const newValue = addOffset(useTimezone, endOfDay, datePickerValue);
+      onChange(parseInt(newValue.locale('en').format('X'), 10));
     }
   }
 
   render() {
-    const { locale, format } = this.props;
-    console.log('format', format);
-    const { startDate, endDate, minDate, selectsStart, selectsEnd } = this.props;
+    const { locale, format, useTimezone } = this.props;
+    // console.log('format', format);
+    const { startDate, endDate, minDate, selectsStart, selectsEnd, value } = this.props;
     //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
     const defaultFormat = 'dd/MM/yyyy';
+    const datePickerValue = removeOffset(useTimezone, value);
     return (
       <DatePickerComponent
-        format={format}
-        value={this.state.asString}
+        dateFormat={format || defaultFormat}
         className="form-control"
         onChange={this.handleChange}
-        selected={this.state.asInt}
+        selected={datePickerValue}
         startDate={startDate}
         endDate={endDate}
         minDate={minDate}
