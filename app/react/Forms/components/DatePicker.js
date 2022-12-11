@@ -43,21 +43,37 @@ const addOffset = (useTimezone, endOfDay, value) => {
   return newValue;
 };
 
+//Allows us to set default format to user's local format rather than dd/MM/yyyy
+//https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
+const getLocaleDateString = (locale) => {
+  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }
+  var formatter = new Intl.DateTimeFormat(locale, options).formatToParts();
+
+  //Will not work for places like Ethiopia or HK, that format d/M/yyyy rather than dd/MM/yyyy
+  return formatter.map(function(e) {
+      switch(e.type) {
+        case 'month':
+          return 'MM'
+        case 'day':
+          return 'DD'
+        case 'year':
+          return 'YYYY'
+        default: 
+          return e.value
+      };
+    }).join('');
+};
+
 //Moment.js is now a legacy project so I'm moving away from it https://momentjs.com/docs/ 
 class DatePicker extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    this.state = {
-      asString : undefined,
-      asInt : undefined,
-    };
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options
-    this.options = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
     registerLocale(props.locale || 'en', localization[props.locale] || localization.enGB);
   }
 
@@ -76,8 +92,7 @@ class DatePicker extends Component {
     const { locale, format, useTimezone } = this.props;
     // console.log('format', format);
     const { startDate, endDate, minDate, selectsStart, selectsEnd, value } = this.props;
-    //Do we want to have something like this? https://stackoverflow.com/questions/2388115/get-locale-short-date-format-using-javascript
-    const defaultFormat = 'dd/MM/yyyy';
+    const defaultFormat = getLocaleDateString(locale);
     const datePickerValue = removeOffset(useTimezone, value);
     return (
       <DatePickerComponent
